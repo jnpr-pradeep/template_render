@@ -1,0 +1,45 @@
+set groups __contrail_ip_clos__ interfaces et-0/0/32 mtu 9192
+delete protocols rstp interface et-0/0/32
+delete interfaces et-0/0/32 unit 0
+set interfaces et-0/0/32 unit 0 family inet
+set groups __contrail_ip_clos__ interfaces et-0/0/32 unit 0 family inet address /30
+set groups __contrail_ip_clos__ interfaces et-0/0/33 mtu 9192
+delete protocols rstp interface et-0/0/33
+delete interfaces et-0/0/33 unit 0
+set interfaces et-0/0/33 unit 0 family inet
+set groups __contrail_ip_clos__ interfaces et-0/0/33 unit 0 family inet address /30
+delete interfaces lo0 unit 0
+set interfaces lo0 unit 0 family inet
+set groups __contrail_ip_clos__ interfaces lo0 unit 0 family inet address /32 primary
+set groups __contrail_ip_clos__ interfaces lo0 unit 0 family inet address /32 preferred
+
+set groups __contrail_ip_clos__ routing-options router-id 20.1.1.252
+set groups __contrail_ip_clos__ routing-options route-distinguisher-id 20.1.1.252
+
+set groups __contrail_ip_clos__ protocols bgp log-updown
+set groups __contrail_ip_clos__ protocols bgp graceful-restart
+set groups __contrail_ip_clos__ protocols bgp group IPCLOS_eBGP type external
+set groups __contrail_ip_clos__ protocols bgp group IPCLOS_eBGP mtu-discovery
+set groups __contrail_ip_clos__ protocols bgp group IPCLOS_eBGP multipath multiple-as
+set groups __contrail_ip_clos__ protocols bgp group IPCLOS_eBGP export IPCLOS_BGP_EXP
+set groups __contrail_ip_clos__ protocols bgp group IPCLOS_eBGP import IPCLOS_BGP_IMP
+set groups __contrail_ip_clos__ protocols bgp group IPCLOS_eBGP bfd-liveness-detection minimum-interval 350
+set groups __contrail_ip_clos__ protocols bgp group IPCLOS_eBGP bfd-liveness-detection multiplier 3
+set groups __contrail_ip_clos__ protocols bgp group IPCLOS_eBGP bfd-liveness-detection session-mode automatic
+set groups __contrail_ip_clos__ protocols bgp group IPCLOS_eBGP local-as 64001
+set groups __contrail_ip_clos__ protocols bgp group IPCLOS_eBGP vpn-apply-export
+set groups __contrail_ip_clos__ protocols bgp group IPCLOS_eBGP neighbor 20.1.1.251
+set groups __contrail_ip_clos__ protocols bgp group IPCLOS_eBGP neighbor 20.1.1.251 description underlay_ip_clos
+set groups __contrail_ip_clos__ protocols bgp group IPCLOS_eBGP neighbor 20.1.1.251 peer-as 64000
+set groups __contrail_ip_clos__ policy-options policy-statement PFE-LB then load-balance per-packet
+set groups __contrail_ip_clos__ policy-options policy-statement IPCLOS_BGP_EXP term loopback from protocol direct
+set groups __contrail_ip_clos__ policy-options policy-statement IPCLOS_BGP_EXP term loopback from protocol bgp
+set groups __contrail_ip_clos__ policy-options policy-statement IPCLOS_BGP_EXP term loopback then accept
+set groups __contrail_ip_clos__ policy-options policy-statement IPCLOS_BGP_EXP term default then reject
+set groups __contrail_ip_clos__ policy-options policy-statement IPCLOS_BGP_IMP term loopback from protocol bgp
+set groups __contrail_ip_clos__ policy-options policy-statement IPCLOS_BGP_IMP term loopback from protocol direct
+set groups __contrail_ip_clos__ policy-options policy-statement IPCLOS_BGP_IMP term loopback then accept
+set groups __contrail_ip_clos__ policy-options policy-statement IPCLOS_BGP_IMP term default then reject
+
+set groups __contrail_ip_clos__ routing-options forwarding-table export PFE-LB
+set groups __contrail_ip_clos__ routing-options forwarding-table ecmp-fast-reroute
