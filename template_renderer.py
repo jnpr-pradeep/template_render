@@ -16,11 +16,12 @@ def get_input_data():
 
 
 def render_jinja_template():
-    from jinja2 import Environment, FileSystemLoader
+    from jinja2 import Environment, FileSystemLoader, ext
 
     # Capture our current directory
     j2_env = Environment(loader=FileSystemLoader(CWD),
-                         trim_blocks=True)
+                         trim_blocks=True,
+                         extensions=(ext.loopcontrols, ext.do))
 
     data = get_input_data()
     # print data
